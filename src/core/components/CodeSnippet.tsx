@@ -1,15 +1,18 @@
 import { codeToHtml } from "shiki";
 
-const codeContent = `const buildFuture = async () => {
-  const developer = {
-    name: "Gustavo Rodrigues",
-    role: "Frontend Engineer",
-    focus: ["Performance", "Design", "UX"]
-  };
+const codeContent = `const developer = {
+  name: "Gustavo Rodrigues",
+  role: "Frontend Developer",
+  stack: ["React", "Next.js", "TypeScript"],
+  transition: true,
+  building: ["interfaces", "automações"],
+};
 
-  while (true) {
-    await developer.evolve();
-    deploy({ success: true, impact: "High" });
+const goal = async () => {
+  while (!fulltime.frontend) {
+    await learn();
+    await build({ real: true });
+    await iterate();
   }
 };`;
 

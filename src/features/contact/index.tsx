@@ -1,15 +1,16 @@
 "use client";
 
+import { useState, useCallback, memo } from "react";
 import type { CSSProperties } from "react";
 import { m as motion } from "framer-motion";
-import { Mail, Sparkles, ArrowUpRight } from "lucide-react";
+import { Mail, Sparkles, ArrowUpRight, Copy, Check, MessageSquare } from "lucide-react";
 import {
   headerVariants,
   cardVariants,
   containerVariants,
 } from "@/core/lib/animation-variants";
 
-/* ─── SVG Icons das Redes ─── */
+/* ─── SVG Icons Oficiais ─── */
 
 const WhatsAppIcon = ({ className, style }: { className?: string; style?: CSSProperties }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} style={style}>
@@ -35,108 +36,273 @@ const GitHubIcon = ({ className, style }: { className?: string; style?: CSSPrope
   </svg>
 );
 
-const DiscordIcon = ({ className, style }: { className?: string; style?: CSSProperties }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} style={style}>
-    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" />
-  </svg>
-);
-
-/* ─── Dados dos Contatos ─── */
-
-// Cards "primários" — ocupam mais espaço no bento grid
-const PRIMARY_LINKS = [
+/* ─── Redes Sociais Atualizadas ─── */
+const SOCIAL_NETWORKS = [
   {
-    label: "WhatsApp",
-    description: "Me envie uma mensagem e vamos conversar sobre como posso ajudar a tirar sua ideia do papel.",
-    href: "https://wa.me/5592992279956",
-    icon: WhatsAppIcon,
-    color: "#25D366",
-    cta: "Iniciar conversa",
-  },
-  {
-    label: "Email",
-    description: "Prefere algo mais formal? Me envie um e-mail detalhando seu projeto ou proposta.",
-    href: "mailto:gustavoaguiar0916@gmail.com",
-    icon: Mail,
-    color: "", // usa brand do tema
-    isBrand: true,
-    cta: "Enviar e-mail",
-    subtitle: "gustavoaguiar0916@gmail.com",
-  },
-];
-
-// Cards "secundários" — compactos, lado a lado
-const SOCIAL_LINKS = [
-  {
-    label: "LinkedIn",
-    description: "Conecte-se profissionalmente",
+    name: "LinkedIn",
+    handle: "/in/gustaguiar",
+    description: "Conexões profissionais e carreira",
     href: "https://www.linkedin.com/in/gustaguiar/",
     icon: LinkedInIcon,
     color: "#0A66C2",
   },
   {
-    label: "Instagram",
-    description: "@gusttazy",
-    href: "https://www.instagram.com/gusttazy/",
+    name: "GitHub",
+    handle: "@gustzwy",
+    description: "Repositórios e código aberto",
+    href: "https://github.com/gustzwy",
+    icon: GitHubIcon,
+    color: "#00ff9d",
+  },
+  {
+    name: "Instagram",
+    handle: "@gustzwy",
+    description: "Acompanhe meu dia a dia",
+    href: "https://www.instagram.com/gustzwy/",
     icon: InstagramIcon,
     color: "#E4405F",
   },
-  {
-    label: "GitHub",
-    description: "Confira meus projetos",
-    href: "https://github.com/gusttazy",
-    icon: GitHubIcon,
-    color: "#8B5CF6",
-  },
-  {
-    label: "Discord",
-    description: "Trocar uma ideia",
-    href: "https://discord.com/users/815705199817129994",
-    icon: DiscordIcon,
-    color: "#5865F2",
-  },
 ];
 
-/* ─── Componente ─── */
+/* ─── Card de Email Interativo com Cópia Rápida ─── */
+const EmailCard = memo(() => {
+  const [copied, setCopied] = useState(false);
+  const emailAddress = "gustavoaguiar0916@gmail.com";
 
+  const handleCopy = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(emailAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2200);
+  }, [emailAddress]);
+
+  return (
+    <motion.div
+      variants={cardVariants}
+      whileHover={{ y: -4 }}
+      className="group relative rounded-3xl p-7 sm:p-8 border border-brand/25 bg-surface/90 overflow-hidden transition-all duration-500 hover:border-brand/50 hover:shadow-[0_8px_32px_rgba(0,255,157,0.08)] flex flex-col justify-between min-h-[250px]"
+    >
+      {/* Glow de fundo */}
+      <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-brand/10 blur-[80px] opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+      <div>
+        {/* Topo: Ícone + Status */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="w-13 h-13 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand transition-transform duration-500 group-hover:scale-105 shadow-sm shadow-brand/10">
+            <Mail size={24} />
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-brand/10 text-brand border border-brand/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+            Resposta rápida
+          </span>
+        </div>
+
+        {/* Textos */}
+        <h3 className="text-xl sm:text-2xl font-bold text-text-main mb-1.5 group-hover:text-brand transition-colors">
+          E-mail Profissional
+        </h3>
+        <p className="text-xs sm:text-sm font-mono text-brand/90 mb-3 select-all">
+          {emailAddress}
+        </p>
+        <p className="text-sm text-text-muted leading-relaxed max-w-md">
+          Disponível para oportunidades como Frontend Júnior, colaborações em projetos e propostas de trabalho.
+        </p>
+      </div>
+
+      {/* Ações: Enviar e Copiar */}
+      <div className="flex flex-wrap items-center gap-3 pt-6 mt-2 border-t border-border/40">
+        <a
+          href={`mailto:${emailAddress}`}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-black font-bold text-xs sm:text-sm shadow-md shadow-brand/20 hover:opacity-90 transition-opacity"
+        >
+          <span>Enviar e-mail</span>
+          <ArrowUpRight size={14} />
+        </a>
+
+        <button
+          onClick={handleCopy}
+          type="button"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface border border-border hover:border-brand/30 text-text-muted hover:text-text-main text-xs sm:text-sm font-medium transition-all cursor-pointer"
+          aria-label="Copiar endereço de e-mail"
+        >
+          {copied ? (
+            <>
+              <Check size={14} className="text-brand" />
+              <span className="text-brand font-semibold">Copiado!</span>
+            </>
+          ) : (
+            <>
+              <Copy size={14} />
+              <span>Copiar e-mail</span>
+            </>
+          )}
+        </button>
+      </div>
+    </motion.div>
+  );
+});
+
+EmailCard.displayName = "EmailCard";
+
+/* ─── Card de WhatsApp ─── */
+const WhatsAppCard = memo(() => {
+  const whatsappHref = "https://wa.me/5592992279956";
+
+  return (
+    <motion.a
+      href={whatsappHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      variants={cardVariants}
+      whileHover={{ y: -4 }}
+      className="group relative rounded-3xl p-7 sm:p-8 border border-white/[0.08] dark:border-white/[0.08] bg-surface/90 overflow-hidden transition-all duration-500 hover:border-[#25D366]/40 hover:shadow-[0_8px_32px_rgba(37,211,102,0.08)] flex flex-col justify-between min-h-[250px]"
+    >
+      {/* Glow de fundo */}
+      <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[#25D366]/10 blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+      <div>
+        {/* Topo: Ícone + Status */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="w-13 h-13 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center text-[#25D366] transition-transform duration-500 group-hover:scale-105 shadow-sm shadow-[#25D366]/10">
+            <WhatsAppIcon className="w-6 h-6" />
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
+            Online
+          </span>
+        </div>
+
+        {/* Textos */}
+        <h3 className="text-xl sm:text-2xl font-bold text-text-main mb-1.5 group-hover:text-[#25D366] transition-colors">
+          WhatsApp Direto
+        </h3>
+        <p className="text-xs sm:text-sm font-mono text-text-muted mb-3">
+          (92) 99227-9956
+        </p>
+        <p className="text-sm text-text-muted leading-relaxed max-w-md">
+          Conversa rápida e objetiva sobre projetos, demandas imediatas ou alinhamento de oportunidades.
+        </p>
+      </div>
+
+      {/* CTA Pill */}
+      <div className="pt-6 mt-2 border-t border-border/40">
+        <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wide px-4 py-2.5 rounded-xl bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/25 group-hover:bg-[#25D366] group-hover:text-black transition-all duration-300">
+          <MessageSquare size={14} />
+          <span>Iniciar conversa</span>
+          <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
+      </div>
+    </motion.a>
+  );
+});
+
+WhatsAppCard.displayName = "WhatsAppCard";
+
+/* ─── Card Individual de Rede Social ─── */
+const SocialCard = memo(({ network }: { network: typeof SOCIAL_NETWORKS[number] }) => {
+  const Icon = network.icon;
+
+  return (
+    <motion.a
+      href={network.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      variants={cardVariants}
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      className="group relative rounded-2xl p-5 sm:p-6 border border-white/[0.08] dark:border-white/[0.08] bg-surface/80 overflow-hidden transition-all duration-400 hover:shadow-lg flex flex-col justify-between"
+    >
+      {/* Glow e Borda Accent no hover */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 50% 20%, ${network.color}15, transparent 70%)`,
+        }}
+      />
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
+        style={{
+          boxShadow: `inset 0 0 0 1px ${network.color}40`,
+        }}
+      />
+
+      <div className="relative">
+        {/* Topo com Ícone e Arrow */}
+        <div className="flex items-center justify-between mb-4">
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+            style={{ backgroundColor: `${network.color}15` }}
+          >
+            <Icon
+              className="w-5 h-5 transition-colors duration-300"
+              style={{ color: network.color }}
+            />
+          </div>
+
+          <ArrowUpRight
+            size={16}
+            className="text-text-muted/40 group-hover:text-text-main transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </div>
+
+        {/* Informações da Rede */}
+        <h4 className="text-base font-bold text-text-main mb-0.5 group-hover:text-brand transition-colors">
+          {network.name}
+        </h4>
+        <p className="text-xs font-mono text-brand font-medium mb-1.5">
+          {network.handle}
+        </p>
+        <p className="text-xs text-text-muted leading-relaxed">
+          {network.description}
+        </p>
+      </div>
+    </motion.a>
+  );
+});
+
+SocialCard.displayName = "SocialCard";
+
+/* ─── Componente Principal de Contato ─── */
 export default function Contact() {
   return (
     <section id="contato" className="relative py-20 sm:py-32 px-4 sm:px-6">
       {/* Glow de fundo */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-glow rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-glow rounded-full blur-[140px]" />
       </div>
 
       <div className="relative max-w-5xl mx-auto">
-        {/* Header */}
+        {/* Header da Seção */}
         <motion.div
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-14 sm:mb-18"
           variants={headerVariants}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/5 border border-brand/20 mb-6 backdrop-blur-sm">
-            <Sparkles size={14} className="text-brand" />
-            <span className="text-brand text-sm font-medium tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand/10 border border-brand/20 mb-5 backdrop-blur-xs">
+            <Sparkles size={13} className="text-brand" />
+            <span className="text-brand text-xs sm:text-sm font-medium tracking-wide">
               Contato
             </span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-bold mb-4">
-            <span className="text-text-main">Vamos trabalhar </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-text-main">
+            Vamos trabalhar{" "}
             <span className="bg-linear-to-r from-brand to-[#00ffcc] bg-clip-text text-transparent">
               juntos?
             </span>
           </h2>
 
           <p className="text-text-muted text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Estou disponível para novos projetos, colaborações e oportunidades.
-            Escolha seu canal preferido e vamos conversar.
+            Estou disponível para novas oportunidades, projetos e networking. Escolha seu canal preferido e vamos conversar.
           </p>
         </motion.div>
 
-        {/* Bento Grid */}
+        {/* Bento Grid de Contatos */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -144,154 +310,16 @@ export default function Contact() {
           viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5"
         >
-          {/* ── Cards Primários (WhatsApp & Email) ── */}
-          {PRIMARY_LINKS.map(({ label, description, href, icon: Icon, color, isBrand, cta, subtitle }) => (
-            <motion.a
-              key={label}
-              href={href}
-              target={href.startsWith("mailto:") ? undefined : "_blank"}
-              rel="noopener noreferrer"
-              variants={cardVariants}
-              whileHover={{ y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative rounded-3xl p-7 sm:p-8 border border-border bg-surface overflow-hidden transition-[border-color,box-shadow] duration-500 hover:shadow-xl flex flex-col justify-between min-h-[220px]"
-            >
-              {/* Glow de fundo do card */}
-              <div
-                className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                style={{
-                  background: isBrand ? "var(--brand)" : color,
-                  opacity: undefined,
-                }}
-              />
-              <div
-                className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-[80px] opacity-0 group-hover:opacity-[0.15] transition-opacity duration-700 pointer-events-none"
-                style={{
-                  background: isBrand ? "var(--brand)" : color,
-                }}
-              />
+          {/* Canais Primários (E-mail com Cópia Rápida + WhatsApp) */}
+          <EmailCard />
+          <WhatsAppCard />
 
-              {/* Borda accent no hover */}
-              <div
-                className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{
-                  boxShadow: `inset 0 0 0 1px ${isBrand ? "var(--brand)" : color}50`,
-                }}
-              />
-
-              <div className="relative">
-                {/* Ícone + Arrow */}
-                <div className="flex items-start justify-between mb-5">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg"
-                    style={{
-                      backgroundColor: `${isBrand ? "var(--brand)" : color}15`,
-                      boxShadow: undefined,
-                    }}
-                  >
-                    <Icon
-                      size={26}
-                      className="w-[26px] h-[26px] transition-colors duration-300"
-                      style={{ color: isBrand ? "var(--brand)" : color }}
-                    />
-                  </div>
-                  <ArrowUpRight
-                    size={20}
-                    className="text-text-muted/30 group-hover:text-text-main transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
-                  />
-                </div>
-
-                {/* Texto */}
-                <h3 className="text-xl font-bold text-text-main mb-2">
-                  {label}
-                </h3>
-                {subtitle && (
-                  <p className="text-xs font-mono text-text-muted/60 mb-2 truncate">
-                    {subtitle}
-                  </p>
-                )}
-                <p className="text-sm text-text-muted leading-relaxed">
-                  {description}
-                </p>
-              </div>
-
-              {/* CTA pill */}
-              <div className="relative mt-6">
-                <span
-                  className="inline-flex items-center gap-2 text-xs font-semibold tracking-wide px-4 py-2 rounded-full transition-all duration-500 border"
-                  style={{
-                    color: isBrand ? "var(--brand)" : color,
-                    borderColor: `${isBrand ? "var(--brand)" : color}30`,
-                    backgroundColor: `${isBrand ? "var(--brand)" : color}08`,
-                  }}
-                >
-                  {cta}
-                  <ArrowUpRight size={12} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </span>
-              </div>
-            </motion.a>
-          ))}
-
-          {/* ── Cards Sociais (4 em row dentro de um sub-grid) ── */}
-          <motion.div
-            variants={cardVariants}
-            className="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5"
-          >
-            {SOCIAL_LINKS.map(({ label, description, href, icon: Icon, color }) => (
-              <motion.a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.97 }}
-                className="group relative rounded-2xl p-5 sm:p-6 border border-border bg-surface overflow-hidden transition-[border-color,box-shadow] duration-500 hover:shadow-lg flex flex-col items-center text-center"
-              >
-                {/* Glow no hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(circle at 50% 40%, ${color}18, transparent 70%)`,
-                  }}
-                />
-
-                {/* Borda accent no hover */}
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    boxShadow: `inset 0 0 0 1px ${color}45`,
-                  }}
-                />
-
-                {/* Ícone */}
-                <div className="relative">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 group-hover:shadow-md"
-                    style={{ backgroundColor: `${color}12` }}
-                  >
-                    <Icon
-                      className="w-[22px] h-[22px] transition-colors duration-300"
-                      style={{ color }}
-                    />
-                  </div>
-                </div>
-
-                {/* Texto */}
-                <h3 className="relative text-sm font-semibold text-text-main mb-1">
-                  {label}
-                </h3>
-                <p className="relative text-xs text-text-muted leading-relaxed">
-                  {description}
-                </p>
-
-                {/* Arrow sutil */}
-                <ArrowUpRight
-                  size={14}
-                  className="absolute top-4 right-4 text-text-muted/0 group-hover:text-text-muted/60 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                />
-              </motion.a>
+          {/* Subgrid Dinâmico de Redes Sociais: 3 Colunas Perfeitamente Balanceadas */}
+          <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            {SOCIAL_NETWORKS.map((network) => (
+              <SocialCard key={network.name} network={network} />
             ))}
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

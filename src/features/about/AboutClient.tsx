@@ -67,12 +67,15 @@ export default function AboutClient({ codeSnippet }: AboutClientProps) {
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             <h3 className="text-2xl font-bold text-text-main mb-4">
-              Desenvolvedor Frontend apaixonado por resolver problemas reais.
+              Desenvolvedor Frontend em transição, resolvendo problemas reais.
             </h3>
             <p className="text-text-muted leading-relaxed text-lg">
-              Olá! Sou Gustavo Rodrigues de Aguiar. Meu foco é transformar
-              ideias complexas em software elegante e performático. Combinando
-              criatividade técnica com uma base sólida em engenharia.
+              Sou Gustavo Rodrigues de Aguiar. Atualmente atuo com suporte técnico na
+              Raio Rastreadores, o que me proporcionou forte contato com usuários finais
+              e resolução de problemas operacionais reais. Desenvolvo interfaces modernas
+              e automações com TypeScript, React e Next.js de forma autônoma, buscando
+              oportunidades para aplicar e evoluir minhas habilidades em desenvolvimento
+              frontend.
             </p>
           </motion.div>
 
@@ -88,7 +91,7 @@ export default function AboutClient({ codeSnippet }: AboutClientProps) {
             </div>
 
             <h4 className="text-xl font-bold text-text-main">Manaus, AM</h4>
-            <p className="text-text-muted text-sm mt-1">Brasil</p>
+            <p className="text-text-muted text-sm mt-1">Alvorada · Brasil</p>
             <span className="mt-3 text-[10px] uppercase tracking-widest text-brand/60 font-mono border border-brand/20 px-2 py-1 rounded-md">
               GMT-4
             </span>
@@ -113,8 +116,8 @@ export default function AboutClient({ codeSnippet }: AboutClientProps) {
               <h4 className="text-lg font-bold text-text-main leading-tight mb-2">
                 Análise e Desenv. de Sistemas
               </h4>
-              <p className="text-text-muted text-sm">
-                Graduado e focado em arquitetura de software e boas práticas.
+              <p className="text-text-muted text-sm mt-1">
+                Graduação · ESBAM (2023–2025)
               </p>
             </div>
           </motion.div>

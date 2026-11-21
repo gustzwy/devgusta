@@ -1,87 +1,212 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState, useCallback, useId } from "react";
 import { m as motion } from "framer-motion";
 import { techGroups, TechGroup, TechItem } from "./tech-groups";
 import clsx from "clsx";
-import { headerVariants, cardVariants, containerVariants } from "@/core/lib/animation-variants";
 
-// Subcomponente de Item Individual
+/* ─── Variantes de Animação com Fade + 8px translateY ─── */
+const headerVariants = {
+  hidden: { opacity: 0, y: -12 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const gridContainerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06, // ~60ms entre cards
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const cardMotionVariants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const chipListVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02, // ~20ms entre chips
+    },
+  },
+};
+
+const chipMotionVariants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.35,
+      ease: "easeOut",
+    },
+  },
+};
+
+/* ─── Subcomponente de Chip Individual ─── */
 const TechBadge = memo(({ tech }: { tech: TechItem }) => {
   const Icon = tech.icon;
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div
-      className="
-        flex items-center gap-3 px-3 py-2.5 rounded-xl 
-        bg-surface border border-border 
-        hover:bg-brand/10 hover:border-brand/30 
-        hover:scale-[1.02] transition-all duration-300 group/item
-        cursor-default
-      "
+    <motion.li
+      variants={chipMotionVariants}
+      role="listitem"
+      className="list-none"
     >
-      {Icon && (
-        <div className="shrink-0">
-          <Icon
-            size={18}
-            className="text-text-muted group-hover/item:text-brand transition-colors duration-300"
-          />
-        </div>
-      )}
-      <span className="text-sm font-medium text-text-muted group-hover/item:text-text-main truncate">
-        {tech.name}
-      </span>
-    </div>
+      <div
+        tabIndex={0}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsHovered(true)}
+        onBlur={() => setIsHovered(false)}
+        className={clsx(
+          "flex items-center gap-2.5 px-3.5 h-11 rounded-xl w-full select-none",
+          "bg-white/[0.04] dark:bg-white/[0.03]",
+          "border border-white/[0.08] dark:border-white/[0.08]",
+          "hover:bg-brand/[0.08] hover:border-brand/40 hover:-translate-y-px",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:border-brand/40",
+          "transition-all duration-200 cursor-default group/chip",
+          "motion-reduce:transition-none motion-reduce:hover:transform-none",
+        )}
+      >
+        <span
+          className="shrink-0 transition-colors duration-200 text-text-muted"
+          style={{
+            color: isHovered ? tech.color : undefined,
+          }}
+          aria-hidden="true"
+        >
+          <Icon className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover/chip:scale-105" />
+        </span>
+        <span className="text-[14px] sm:text-[15px] font-medium text-text-muted group-hover/chip:text-text-main whitespace-nowrap transition-colors duration-200">
+          {tech.name}
+        </span>
+      </div>
+    </motion.li>
   );
 });
 
 TechBadge.displayName = "TechBadge";
 
-// Subcomponente de Cartão de Grupo
+/* ─── Subcomponente de Card de Grupo ─── */
 const TechCard = memo(({ group }: { group: TechGroup }) => {
   const GroupIcon = group.icon;
+  const isPrimary = Boolean(group.isPrimary);
+  const cardHeadingId = useId();
+
+  // Spotlight sutil que segue o cursor (apenas desktop)
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setMousePos(null);
+  }, []);
 
   return (
     <motion.div
-      variants={cardVariants}
+      variants={cardMotionVariants}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className={clsx(
-        "relative rounded-3xl p-6 flex flex-col overflow-hidden",
-        "border border-border bg-surface shadow-lg",
-        "transition-[border-color,box-shadow] duration-300 group hover:border-brand/30",
-        "hover:shadow-[0_8px_32px_0_var(--glow)]",
+        "relative rounded-3xl p-7 sm:p-8 flex flex-col justify-between overflow-hidden",
+        "bg-white/[0.03] dark:bg-white/[0.025]",
+        isPrimary
+          ? "border border-brand/30 hover:border-brand/50 shadow-[0_0_24px_rgba(0,255,157,0.04)]"
+          : "border border-white/[0.08] dark:border-white/[0.08] hover:border-white/20",
+        "transition-colors duration-300 group",
         group.colSpan,
         group.rowSpan,
       )}
     >
-      {/* Texture Layer */}
-      <div className="absolute inset-0 bg-linear-to-b from-white/5 to-transparent pointer-events-none opacity-50 dark:opacity-100" />
+      {/* Spotlight no hover (somente desktop, sem glassmorphism) */}
+      {mousePos && (
+        <div
+          className="pointer-events-none absolute -inset-px rounded-3xl transition-opacity duration-300 opacity-100 hidden lg:block"
+          style={{
+            background: `radial-gradient(400px circle at ${mousePos.x}px ${mousePos.y}px, rgba(0, 255, 157, 0.05), transparent 75%)`,
+          }}
+          aria-hidden="true"
+        />
+      )}
 
-      <div className="relative z-10 flex flex-col h-full">
-        {/* Header do Card */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="p-3 rounded-2xl bg-background border border-border text-brand shadow-inner">
-            <GroupIcon size={22} />
+      {/* Conteúdo Principal */}
+      <div className="relative z-10 flex flex-col h-full justify-between">
+        {/* Cabeçalho do Card */}
+        <div>
+          <div className="flex items-center justify-between gap-3 mb-5">
+            {/* Ícone em tile padronizado verde a ~10% */}
+            <div
+              className="w-11 h-11 rounded-xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand shrink-0"
+              aria-hidden="true"
+            >
+              <GroupIcon size={20} />
+            </div>
+
+            {/* Indicador no cabeçalho para o card principal */}
+            {isPrimary && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase bg-brand/10 text-brand border border-brand/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
+                Foco Principal
+              </span>
+            )}
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-text-main tracking-tight">
-              {group.title}
-            </h3>
-            <p className="text-text-muted text-xs font-medium mt-0.5">
-              {group.description}
-            </p>
-          </div>
+
+          <h3
+            id={cardHeadingId}
+            className="text-xl sm:text-[22px] font-semibold text-text-main tracking-tight"
+          >
+            {group.title}
+          </h3>
+
+          <p className="text-sm sm:text-[15px] text-text-muted leading-relaxed mt-1.5 max-w-xl">
+            {group.description}
+          </p>
         </div>
 
-        {/* Lista de Itens */}
-        <div
+        {/* Lista Semântica de Chips de Tecnologias */}
+        <motion.ul
+          variants={chipListVariants}
+          role="list"
+          aria-labelledby={cardHeadingId}
           className={clsx(
-            "gap-3 mt-auto",
-            group.id === "mobile" ? "flex flex-col" : "grid grid-cols-2",
+            "mt-6 sm:mt-7",
+            // Layout dos chips: Frontend e Tools em 4 colunas no desktop; Mobile e Backend em 2 colunas
+            group.id === "frontend"
+              ? "grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3"
+              : group.id === "tools"
+                ? "grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3"
+                : "grid grid-cols-2 gap-2.5 sm:gap-3",
           )}
         >
           {group.techs.map((tech) => (
             <TechBadge key={tech.name} tech={tech} />
           ))}
-        </div>
+        </motion.ul>
       </div>
     </motion.div>
   );
@@ -89,49 +214,48 @@ const TechCard = memo(({ group }: { group: TechGroup }) => {
 
 TechCard.displayName = "TechCard";
 
+/* ─── Componente Principal da Seção ─── */
 export default function Techs() {
   return (
     <section
       id="techs"
-      className="relative py-20 px-4 sm:px-6 bg-transparent"
+      className="relative py-20 sm:py-28 px-4 sm:px-6 bg-transparent"
+      aria-label="Tecnologias e Ferramentas"
     >
-      {/* Ambient glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 right-0 w-[450px] h-[450px] bg-glow rounded-full blur-[130px]" />
-        <div className="absolute bottom-1/3 left-0 w-[350px] h-[350px] bg-glow rounded-full blur-[100px]" />
-      </div>
-
       <div className="max-w-7xl mx-auto relative">
-        {/* HEADER DA SEÇÃO */}
+        {/* HEADER DA SEÇÃO — 64–80px de respiro até o grid */}
         <motion.div
-          className="text-center mb-20"
+          className="text-center mb-16 sm:mb-20"
           variants={headerVariants}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand/5 border border-brand/20 mb-6 backdrop-blur-sm">
-            <span className="text-brand text-sm font-medium tracking-wide">
+          {/* Badge Discreto */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand/10 border border-brand/20 mb-5 backdrop-blur-xs">
+            <span className="text-brand text-xs sm:text-sm font-medium tracking-wide">
               Stack Tecnológico
             </span>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="text-text-main">Tecnologias & </span>
+          {/* Título com Tracking Levemente Fechado */}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-text-main max-w-2xl mx-auto">
+            Tecnologias &{" "}
             <span className="bg-linear-to-r from-brand to-[#00ffcc] bg-clip-text text-transparent">
               Ferramentas
             </span>
           </h2>
 
-          <p className="text-text-muted max-w-2xl mx-auto">
+          {/* Subtítulo com Contraste AA */}
+          <p className="text-text-muted text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
             Organização da minha stack por responsabilidade e contexto de uso.
           </p>
         </motion.div>
 
-        {/* GRID PRINCIPAL */}
+        {/* BENTO GRID PRINCIPAL: 1 coluna no mobile, 2 colunas no tablet, 3 colunas no desktop */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-auto"
-          variants={containerVariants}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"
+          variants={gridContainerVariants}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.1 }}

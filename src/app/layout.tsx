@@ -13,11 +13,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DevGusta — Portfólio de Gustavo Rodrigues",
+  title: "devGusta",
   description:
-    "Portfólio profissional de Gustavo Rodrigues de Aguiar. Desenvolvedor Frontend especializado em React, Next.js e design systems. Criando experiências digitais únicas.",
+    "Portfólio de Gustavo Rodrigues de Aguiar — Desenvolvedor Frontend Júnior em transição, com projetos práticos em React, Next.js e TypeScript.",
   keywords: [
     "desenvolvedor frontend",
+    "frontend júnior",
     "react",
     "next.js",
     "typescript",
@@ -27,19 +28,19 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Gustavo Rodrigues de Aguiar" }],
   openGraph: {
-    title: "DevGusta — Portfólio de Gustavo Rodrigues",
+    title: "devGusta",
     description:
-      "Criando experiências digitais únicas e interfaces modernas. Especializado em React, Next.js e design systems.",
+      "Desenvolvedor Frontend em transição, com projetos práticos em React, Next.js e TypeScript.",
     url: "https://gusttazy.vercel.app",
-    siteName: "DevGusta",
+    siteName: "devGusta",
     locale: "pt_BR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevGusta — Portfólio de Gustavo Rodrigues",
-    description: "Criando experiências digitais únicas e interfaces modernas.",
-    creator: "@gusttazy",
+    title: "devGusta — Portfólio de Gustavo Rodrigues",
+    description: "Desenvolvedor Frontend em transição. Projetos em React, Next.js e TypeScript.",
+    creator: "@gustzwy",
   },
   robots: {
     index: true,
