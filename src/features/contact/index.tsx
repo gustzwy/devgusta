@@ -80,16 +80,15 @@ const EmailCard = memo(() => {
   return (
     <motion.div
       variants={cardVariants}
-      whileHover={{ y: -4 }}
-      className="group relative rounded-3xl p-7 sm:p-8 border border-brand/25 bg-surface/90 overflow-hidden transition-all duration-500 hover:border-brand/50 hover:shadow-[0_8px_32px_rgba(0,255,157,0.08)] flex flex-col justify-between min-h-[250px]"
+      className="group relative rounded-3xl p-7 sm:p-8 border border-border bg-surface overflow-hidden flex flex-col justify-between min-h-[250px] hover:border-brand/40 transition-[border-color,box-shadow] duration-500"
     >
       {/* Glow de fundo */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-brand/10 blur-[80px] opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-brand/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-      <div>
+      <div className="relative z-10">
         {/* Topo: Ícone + Status */}
         <div className="flex items-center justify-between mb-6">
-          <div className="w-13 h-13 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand transition-transform duration-500 group-hover:scale-105 shadow-sm shadow-brand/10">
+          <div className="w-13 h-13 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center text-brand transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-brand/10">
             <Mail size={24} />
           </div>
 
@@ -112,7 +111,7 @@ const EmailCard = memo(() => {
       </div>
 
       {/* Ações: Enviar e Copiar */}
-      <div className="flex flex-wrap items-center gap-3 pt-6 mt-2 border-t border-border/40">
+      <div className="relative z-10 flex flex-wrap items-center gap-3 pt-6 mt-2 border-t border-border/40">
         <a
           href={`mailto:${emailAddress}`}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand text-black font-bold text-xs sm:text-sm shadow-md shadow-brand/20 hover:opacity-90 transition-opacity"
@@ -124,7 +123,7 @@ const EmailCard = memo(() => {
         <button
           onClick={handleCopy}
           type="button"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface border border-border hover:border-brand/30 text-text-muted hover:text-text-main text-xs sm:text-sm font-medium transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface border border-border hover:border-brand/30 text-text-muted hover:text-text-main text-xs sm:text-sm font-medium transition-[border-color,color] duration-300 cursor-pointer"
           aria-label="Copiar endereço de e-mail"
         >
           {copied ? (
@@ -156,16 +155,15 @@ const WhatsAppCard = memo(() => {
       target="_blank"
       rel="noopener noreferrer"
       variants={cardVariants}
-      whileHover={{ y: -4 }}
-      className="group relative rounded-3xl p-7 sm:p-8 border border-white/[0.08] dark:border-white/[0.08] bg-surface/90 overflow-hidden transition-all duration-500 hover:border-[#25D366]/40 hover:shadow-[0_8px_32px_rgba(37,211,102,0.08)] flex flex-col justify-between min-h-[250px]"
+      className="group relative rounded-3xl p-7 sm:p-8 border border-border bg-surface overflow-hidden flex flex-col justify-between min-h-[250px] hover:border-[#25D366]/40 transition-[border-color,box-shadow] duration-500"
     >
       {/* Glow de fundo */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 rounded-full bg-[#25D366]/10 blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#25D366]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      <div>
+      <div className="relative z-10">
         {/* Topo: Ícone + Status */}
         <div className="flex items-center justify-between mb-6">
-          <div className="w-13 h-13 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center text-[#25D366] transition-transform duration-500 group-hover:scale-105 shadow-sm shadow-[#25D366]/10">
+          <div className="w-13 h-13 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center text-[#25D366] transition-transform duration-300 group-hover:scale-105 shadow-sm shadow-[#25D366]/10">
             <WhatsAppIcon className="w-6 h-6" />
           </div>
 
@@ -188,8 +186,8 @@ const WhatsAppCard = memo(() => {
       </div>
 
       {/* CTA Pill */}
-      <div className="pt-6 mt-2 border-t border-border/40">
-        <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wide px-4 py-2.5 rounded-xl bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/25 group-hover:bg-[#25D366] group-hover:text-black transition-all duration-300">
+      <div className="relative z-10 pt-6 mt-2 border-t border-border/40">
+        <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wide px-4 py-2.5 rounded-xl bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/25 group-hover:bg-[#25D366] group-hover:text-black transition-colors duration-300">
           <MessageSquare size={14} />
           <span>Iniciar conversa</span>
           <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -206,14 +204,11 @@ const SocialCard = memo(({ network }: { network: typeof SOCIAL_NETWORKS[number] 
   const Icon = network.icon;
 
   return (
-    <motion.a
+    <a
       href={network.href}
       target="_blank"
       rel="noopener noreferrer"
-      variants={cardVariants}
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.98 }}
-      className="group relative rounded-2xl p-5 sm:p-6 border border-white/[0.08] dark:border-white/[0.08] bg-surface/80 overflow-hidden transition-all duration-400 hover:shadow-lg flex flex-col justify-between"
+      className="group relative rounded-2xl p-5 sm:p-6 border border-border bg-surface overflow-hidden flex flex-col justify-between hover:border-brand/40 transition-[border-color,box-shadow] duration-500"
     >
       {/* Glow e Borda Accent no hover */}
       <div
@@ -229,11 +224,11 @@ const SocialCard = memo(({ network }: { network: typeof SOCIAL_NETWORKS[number] 
         }}
       />
 
-      <div className="relative">
+      <div className="relative z-10">
         {/* Topo com Ícone e Arrow */}
         <div className="flex items-center justify-between mb-4">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+            className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
             style={{ backgroundColor: `${network.color}15` }}
           >
             <Icon
@@ -244,7 +239,7 @@ const SocialCard = memo(({ network }: { network: typeof SOCIAL_NETWORKS[number] 
 
           <ArrowUpRight
             size={16}
-            className="text-text-muted/40 group-hover:text-text-main transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="text-text-muted/40 group-hover:text-text-main transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
         </div>
 
@@ -259,7 +254,7 @@ const SocialCard = memo(({ network }: { network: typeof SOCIAL_NETWORKS[number] 
           {network.description}
         </p>
       </div>
-    </motion.a>
+    </a>
   );
 });
 
@@ -269,7 +264,7 @@ SocialCard.displayName = "SocialCard";
 export default function Contact() {
   return (
     <section id="contato" className="relative py-20 sm:py-32 px-4 sm:px-6">
-      {/* Glow de fundo */}
+      {/* Ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-glow rounded-full blur-[140px]" />
       </div>
@@ -302,24 +297,27 @@ export default function Contact() {
           </p>
         </motion.div>
 
-        {/* Bento Grid de Contatos */}
+        {/* Bento Grid de Contatos — Seguindo a mesma arquitetura do About */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5"
         >
           {/* Canais Primários (E-mail com Cópia Rápida + WhatsApp) */}
           <EmailCard />
           <WhatsAppCard />
 
-          {/* Subgrid Dinâmico de Redes Sociais: 3 Colunas Perfeitamente Balanceadas */}
-          <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          {/* Subgrid de Redes Sociais animado com cardVariants como linha única do Bento Grid */}
+          <motion.div
+            variants={cardVariants}
+            className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5"
+          >
             {SOCIAL_NETWORKS.map((network) => (
               <SocialCard key={network.name} network={network} />
             ))}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
